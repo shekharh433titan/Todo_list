@@ -25,8 +25,14 @@ json-server --watch db.json --port 3001
 
 ### 2. To run the Project
 
-Run the following command to start server:
+Run the following command to start the development server:
 
 ```bash
 npm run dev
 ```
+
+### 📋 Features
+* 📝 Add Tasks: Easily add tasks to your to-do list.
+* ✅ Mark as Complete: Mark tasks as completed to keep track of your progress.
+* ❌ Delete Tasks: Remove tasks when they're no longer needed.
+* 💾 Persistent Data Storage: Your data is stored using a JSON database for seamless task management.
