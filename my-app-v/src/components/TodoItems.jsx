@@ -1,54 +1,41 @@
 import React from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import useTodoLogic from "./useTodoLogic";
+import myQueryClient from "./MyQueryClient";
 
-import { fetchTodos } from "../api/api";
 
-function TodoItems({ handleEditInApp, handleDeleteInApp }) {
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
-  // Fetch todos using useQuery
-  const { data: todos = [], isLoading, error } = useQuery({
-    queryKey: ["todos"],
-    queryFn: fetchTodos,
-  });
+function TodoItemsFun() {
+
+  const {
+    todos,
+    isLoading,
+    error,
+    deleteTodoMutation,
+    handleEdit
+  } = useTodoLogic(myQueryClient);
 
 
   const onView = (todo) => {
     console.log("Viewing:", todo);
-    toggleDetails(todo.id);
+    //toggleDetails(todo.id);
   };
 
-  const onDelete = (key) => {
-    console.log("Deleting todo with key:", key);
-    handleDeleteInApp(key);
-  };
+  // const toggleDetails = (id) => {
+  //     console.log("test incomplete");
 
-  const onUpdate = (todo) => {
-    console.log("Updating:", todo);
-    handleEditInApp(todo);
-  };
-
-  const toggleDetails = (id) => {
-    console.log(id);
-    console.log("dsfs");
-
-    const detailsDiv = document.getElementById(id);
-    if (detailsDiv.style.display === "none" || detailsDiv.style.display === "") {
-      detailsDiv.style.display = "block"; // Show details
-    } else {
-      detailsDiv.style.display = "none"; // Hide details
-    }
-  }
-
-  // Handle loading state
-  if (isLoading) {
-    return <div className="text-center mt-3">Loading todos...</div>;
-  }
-
-  // Handle error state
-  if (error) {
-    return <div className="text-center mt-3 text-danger">Error fetching todos</div>;
-  }
+  // }
 
   if (todos.length === 0) {
     return (
@@ -60,7 +47,6 @@ function TodoItems({ handleEditInApp, handleDeleteInApp }) {
 
   return (
     <>
-
       <div className="container mt-3">
         {/* Loop through todos and display each item */}
         {todos.map((todo) => (
@@ -95,7 +81,7 @@ function TodoItems({ handleEditInApp, handleDeleteInApp }) {
                   <li>
                     <button
                       className="dropdown-item text-danger"
-                      onClick={() => onDelete(todo.id)}
+                      onClick={() => deleteTodoMutation(todo)}
                     >
                       Delete
                     </button>
@@ -103,7 +89,7 @@ function TodoItems({ handleEditInApp, handleDeleteInApp }) {
                   <li>
                     <button
                       className="dropdown-item"
-                      onClick={() => onUpdate(todo)}
+                      onClick={() => handleEdit(todo)}
                     >
                       Update
                     </button>
@@ -113,7 +99,7 @@ function TodoItems({ handleEditInApp, handleDeleteInApp }) {
             </div>
 
             {/* show todo item */}
-            <div id={todo.id} className="todo-details">
+            {/* <div id={todo.id} className="todo-details">
               < div className="todo-details row align-items-center mb-3 p-2 border rounded bg-success-subtle" >
                 <div className="col-md-10">
                   <strong>Description:</strong> {todo.description}
@@ -128,12 +114,21 @@ function TodoItems({ handleEditInApp, handleDeleteInApp }) {
                     onClick={() => toggleDetails(todo.id)}>✖</button>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         ))}
       </div >
 
     </>
+  );
+}
+
+// Root Component to wrap App with QueryClientProvider
+function TodoItems() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TodoItemsFun />
+    </QueryClientProvider>
   );
 }
 
