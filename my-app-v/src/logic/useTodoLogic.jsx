@@ -1,8 +1,12 @@
-import { useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchTodos, addTodo, updateTodo, deleteTodo } from "../api/api";
+import MyQueryClient from "./MyQueryClient";
 
-const useTodoLogic = (queryClient) => {
+const TodoContext = createContext();
+
+export const TodoProvider = ({ children }) => {
+    const queryClient = MyQueryClient();
 
     const [formData, setFormData] = useState({
         displayName: "",
@@ -11,15 +15,14 @@ const useTodoLogic = (queryClient) => {
         attribute: "",
     });
 
+    const [buttonLabel, setButtonLabel] = useState("Submit");
     const [editingTodo, setEditingTodo] = useState(null);
 
-    // Fetch todos
     const { data: todos = [], isLoading, error } = useQuery({
         queryKey: ["todos"],
         queryFn: fetchTodos,
     });
 
-    // Add todo mutation
     const addTodoMutation = useMutation({
         mutationFn: addTodo,
         onSuccess: () => {
@@ -27,7 +30,6 @@ const useTodoLogic = (queryClient) => {
         },
     });
 
-    // Update todo mutation
     const updateTodoMutation = useMutation({
         mutationFn: updateTodo,
         onSuccess: () => {
@@ -35,7 +37,6 @@ const useTodoLogic = (queryClient) => {
         },
     });
 
-    // Delete todo mutation
     const deleteTodoMutation = useMutation({
         mutationFn: deleteTodo,
         onSuccess: () => {
@@ -43,7 +44,17 @@ const useTodoLogic = (queryClient) => {
         },
     });
 
-    // Handlers
+    const deleteTodoFun = (todo) => {
+        deleteTodoMutation.mutate({
+            id: todo.id,
+            key: todo.key,
+            displayName: todo.displayName,
+            description: todo.description,
+            attribute: todo.attribute,
+            completed: false,
+        });
+    };
+
     const handleChange = (e) => {
         const { id, value } = e.target;
         setFormData((prev) => ({
@@ -71,63 +82,68 @@ const useTodoLogic = (queryClient) => {
         }
     };
 
-    // // still not test
-    // // Load a todo into the form for editing call by todo_item jsx
     const handleEdit = (todo) => {
-        const submitUpdateButton = document.getElementById("submit-update-btn");
-        if (submitUpdateButton) {
-            submitUpdateButton.innerText = "Update";
-        }
+        setButtonLabel("Update");
         setEditingTodo(todo);
-        setFormData({
-            key: todo.key,
-            displayName: todo.displayName,
-            description: todo.description,
-            attribute: todo.attribute,
-        });
+        setFormData(todo);
     };
 
     const handleSubmitUpdateClick = (e) => {
         if (editingTodo) {
-            handleUpdate(e);
-        } else {
-            handleSubmit(e);
-        }
-    };
-
-    const handelCancelClick = () => {
-        if (editingTodo) {
-            setEditingTodo(null); // Reset editing state
-            const submitUpdateButton = document.getElementById("submit-update-btn");
-            if (submitUpdateButton) {
-                submitUpdateButton.innerText = "Submit";
-            }
+            updateTodoMutation.mutate({
+                ...editingTodo,
+                ...formData,
+            });
+            setEditingTodo(null);
+            setButtonLabel("Submit");
             setFormData({
                 key: "",
                 displayName: "",
                 description: "",
                 attribute: "",
             });
+        } else {
+            handleSubmit(e);
         }
-    }
-
-    return {
-        formData,
-        setFormData,
-        editingTodo,
-        setEditingTodo,
-        todos,
-        isLoading,
-        error,
-        handleChange,
-        handleSubmit,
-        addTodoMutation,
-        updateTodoMutation,
-        deleteTodoMutation,
-        handleSubmitUpdateClick,
-        handelCancelClick,
-        handleEdit
     };
+
+    const handelCancelClick = () => {
+        setEditingTodo(null);
+        setButtonLabel("Submit");
+        setFormData({
+            key: "",
+            displayName: "",
+            description: "",
+            attribute: "",
+        });
+    };
+
+    return (
+        <TodoContext.Provider
+            value={{
+                formData,
+                setFormData,
+                buttonLabel,
+                editingTodo,
+                setEditingTodo,
+                todos,
+                isLoading,
+                error,
+                handleChange,
+                handleSubmit,
+                deleteTodoFun,
+                handleSubmitUpdateClick,
+                handelCancelClick,
+                handleEdit,
+            }}
+        >
+            {children}
+        </TodoContext.Provider>
+    );
+};
+
+export const useTodoLogic = () => {
+    return useContext(TodoContext);
 };
 
 export default useTodoLogic;

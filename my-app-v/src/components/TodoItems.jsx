@@ -1,30 +1,13 @@
 import React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import useTodoLogic from "./useTodoLogic";
-import myQueryClient from "./MyQueryClient";
+import useTodoLogic from "../logic/useTodoLogic";
 
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
-
-function TodoItemsFun() {
+function TodoItems() {
 
   const {
     todos,
-    isLoading,
-    error,
-    deleteTodoMutation,
-    handleEdit
-  } = useTodoLogic(myQueryClient);
+    deleteTodoFun,
+    handleEdit,
+  } = useTodoLogic();
 
 
   const onView = (todo) => {
@@ -34,16 +17,15 @@ function TodoItemsFun() {
 
   // const toggleDetails = (id) => {
   //     console.log("test incomplete");
-
   // }
 
-  if (todos.length === 0) {
-    return (
-      <div className="container mt-3">
-        <div className="row align-items-center mb-3 p-2 border rounded bg-light">No todos</div>
-      </div>
-    )
-  }
+  // if (todos.length === 0) {
+  //   return (
+  //     <div className="container mt-3">
+  //       <div className="row align-items-center mb-3 p-2 border rounded bg-light">No todos</div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <>
@@ -81,7 +63,7 @@ function TodoItemsFun() {
                   <li>
                     <button
                       className="dropdown-item text-danger"
-                      onClick={() => deleteTodoMutation(todo)}
+                      onClick={() => deleteTodoFun(todo)}
                     >
                       Delete
                     </button>
@@ -120,15 +102,6 @@ function TodoItemsFun() {
       </div >
 
     </>
-  );
-}
-
-// Root Component to wrap App with QueryClientProvider
-function TodoItems() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TodoItemsFun />
-    </QueryClientProvider>
   );
 }
 

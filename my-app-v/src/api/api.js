@@ -18,6 +18,8 @@ export const updateTodo = async (updatedTodo) => {
 };
 
 export const deleteTodo = async (req) => {
-    // console.log(req);
-    await axios.delete(`${API_URL}/${req.id}`);
+    console.log(req);
+    const response = await axios.delete(`${API_URL}/${req.id}`);
+    console.log(response);
+    return response;
 };

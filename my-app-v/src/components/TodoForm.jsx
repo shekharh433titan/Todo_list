@@ -1,21 +1,11 @@
 import React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import useTodoLogic from "./useTodoLogic";
+import { QueryClientProvider } from "@tanstack/react-query";
+// import useTodoLogic from "./useTodoLogic";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
+import { useTodoLogic } from "../logic/useTodoLogic";
 
-function TodoFormFun() {
 
+function TodoForm() {
   const {
     formData,
     handleChange,
@@ -23,7 +13,8 @@ function TodoFormFun() {
     handelCancelClick,
     isLoading,
     error,
-  } = useTodoLogic(queryClient);
+    buttonLabel
+  } = useTodoLogic();
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching data</div>;
@@ -98,7 +89,7 @@ function TodoFormFun() {
               type="button"
               className="btn btn-primary me-2"
             >
-              Submit
+              {buttonLabel}
             </button>
             <button
               id="cancel-btn"
@@ -112,15 +103,6 @@ function TodoFormFun() {
         </form>
       </div>
     </>
-  );
-}
-
-// Root Component to wrap App with QueryClientProvider
-function TodoForm() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TodoFormFun />
-    </QueryClientProvider>
   );
 }
 
