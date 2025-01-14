@@ -42,3 +42,7 @@ body {
   padding: 10px;
   border: 2px solid red;
 }
+
+.todo-details {
+  display: none;
+}

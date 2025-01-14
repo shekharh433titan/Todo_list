@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery, useMutation } from "@tanstack/react-query";
 
-import TodoItems from "./todo_item.jsx";
+import TodoItems from "./todo_items.jsx";
 import { fetchTodos, addTodo, updateTodo, deleteTodo } from "../api/api.js";
 
 // Initialize QueryClient once outside of components
@@ -25,6 +25,8 @@ function TodoFun() {
     description: "",
     attribute: "",
   });
+
+  const [addingTodo, setAddingTodo] = useState(null);
   const [editingTodo, setEditingTodo] = useState(null);
 
 
@@ -50,13 +52,6 @@ function TodoFun() {
     },
   });
 
-  // const deleteTodo = async ({ id }) => {
-  //   const response = await fetch(`/api/todos/${id}`, { method: "DELETE" });
-  //   if (!response.ok) {
-  //     throw new Error("Failed to delete todo");
-  //   }
-  //   return response.json();
-  // };
 
   const deleteTodoMutation = useMutation({
     mutationFn: deleteTodo,
@@ -92,6 +87,7 @@ function TodoFun() {
         attribute: `${formData.attribute}`,
         completed: false,
       });
+      // ****
       setFormData({
         key: "",
         displayName: "",
@@ -114,19 +110,17 @@ function TodoFun() {
         description: formData.description || editingTodo.description,
         attribute: formData.attribute || editingTodo.attribute,
       });
-      setEditingTodo(null); // Reset editing state
-      setFormData({
-        key: "",
-        displayName: "",
-        description: "",
-        attribute: "",
-      });
+
+      cancelEditState();
     }
   };
 
   // Load a todo into the form for editing call by todo_item jsx
   const handleEdit = (todo) => {
-    
+    const submitUpdateButton = document.getElementById("submit-update-btn");
+    if (submitUpdateButton) {
+      submitUpdateButton.innerText = "Update";
+    }
     setEditingTodo(todo);
     setFormData({
       key: todo.key,
@@ -136,6 +130,36 @@ function TodoFun() {
     });
   };
 
+  const handleSubmitUpdateClick = (e) => {
+    if (editingTodo) {
+      handleUpdate(e);
+    } else {
+      handleSubmit(e);
+    }
+  };
+
+  const handleCancelClick = (e) => {
+    if (editingTodo) {
+      cancelEditState();
+    }
+  };
+
+  const cancelEditState = () => {
+    if (editingTodo) {
+      setEditingTodo(null); // Reset editing state
+      const submitUpdateButton = document.getElementById("submit-update-btn");
+      if (submitUpdateButton) {
+        submitUpdateButton.innerText = "Submit";
+      }
+      setFormData({
+        key: "",
+        displayName: "",
+        description: "",
+        attribute: "",
+      });
+    }
+  }
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching data</div>;
 
@@ -143,7 +167,7 @@ function TodoFun() {
     <>
       {/* Todo form */}
       <div className="form-container">
-        <form onSubmit={handleSubmit}>
+        <form>
           <div className="form-input-row">
             <div className="mb-3">
               <label htmlFor="displayName" className="form-label">
@@ -204,20 +228,21 @@ function TodoFun() {
 
           <div className="btn-group">
             <button
-              type="submit"
+              id="submit-update-btn"
+              onClick={handleSubmitUpdateClick}
+              type="button"
               className="btn btn-primary me-2"
             >
               Submit
             </button>
-
             <button
+              id="cancel-btn"
+              onClick={handleCancelClick}
               type="button"
-              className="btn btn-secondary"
-              onClick={handleUpdate}
+              className="btn btn-secondry me-2"
             >
-              Update
+              Cancel
             </button>
-
           </div>
         </form>
       </div>
