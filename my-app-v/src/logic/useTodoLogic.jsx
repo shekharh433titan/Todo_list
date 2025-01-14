@@ -3,6 +3,11 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchTodos, addTodo, updateTodo, deleteTodo } from "../api/api";
 import MyQueryClient from "./MyQueryClient";
 
+
+// If you want to initialize this hook once for reuse across components, 
+// consider using a React Context to share the logic and state globally 
+// while ensuring proper React Hook rules are followed.
+
 const TodoContext = createContext();
 
 export const TodoProvider = ({ children }) => {

@@ -12,6 +12,10 @@ import { TodoProvider } from "./logic/useTodoLogic";
 // It acts as a context provider, making the QueryClient instance available to 
 // all components within its child hierarchy.
 
+// If you want to initialize this hook once for reuse across components, 
+// consider using a React Context to share the logic and state globally 
+// while ensuring proper React Hook rules are followed.
+
 function App() {
   const queryClient = MyQueryClient();
   return (
