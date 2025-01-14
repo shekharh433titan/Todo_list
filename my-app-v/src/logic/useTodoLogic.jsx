@@ -11,17 +11,21 @@ import MyQueryClient from "./MyQueryClient";
 const TodoContext = createContext();
 
 export const TodoProvider = ({ children }) => {
-    const queryClient = MyQueryClient();
 
-    const [formData, setFormData] = useState({
+    const emptyTodo = {
         displayName: "",
         key: "",
         description: "",
         attribute: "",
-    });
+    }
+
+    const queryClient = MyQueryClient();
+
+    const [formData, setFormData] = useState(emptyTodo);
 
     const [buttonLabel, setButtonLabel] = useState("Submit");
     const [editingTodo, setEditingTodo] = useState(null);
+    const [viewTodoItem, setViewTodoItem] = useState(emptyTodo);
 
     const { data: todos = [], isLoading, error } = useQuery({
         queryKey: ["todos"],
@@ -78,12 +82,7 @@ export const TodoProvider = ({ children }) => {
                 attribute: formData.attribute,
                 completed: false,
             });
-            setFormData({
-                key: "",
-                displayName: "",
-                description: "",
-                attribute: "",
-            });
+            setFormData(emptyTodo);
         }
     };
 
@@ -101,12 +100,7 @@ export const TodoProvider = ({ children }) => {
             });
             setEditingTodo(null);
             setButtonLabel("Submit");
-            setFormData({
-                key: "",
-                displayName: "",
-                description: "",
-                attribute: "",
-            });
+            setFormData(emptyTodo);
         } else {
             handleSubmit(e);
         }
@@ -115,13 +109,24 @@ export const TodoProvider = ({ children }) => {
     const handelCancelClick = () => {
         setEditingTodo(null);
         setButtonLabel("Submit");
-        setFormData({
-            key: "",
-            displayName: "",
-            description: "",
-            attribute: "",
-        });
+        setFormData(emptyTodo);
     };
+
+    const viewTodo = (todo) => {
+        console.log(todo);
+        setViewTodoItem(todo);
+        const detailsDiv = document.getElementById("todo-item-view-id");
+        detailsDiv.style.display = "block"; // Show details
+    };
+
+    const closeViewTodoComp = () => {
+        // console.log(todo);
+        setViewTodoItem(emptyTodo);
+        const detailsDiv = document.getElementById("todo-item-view-id");
+        detailsDiv.style.display = "none"; // Show details
+    };
+
+
 
     return (
         <TodoContext.Provider
@@ -140,6 +145,9 @@ export const TodoProvider = ({ children }) => {
                 handleSubmitUpdateClick,
                 handelCancelClick,
                 handleEdit,
+                viewTodo,
+                viewTodoItem,
+                closeViewTodoComp
             }}
         >
             {children}
