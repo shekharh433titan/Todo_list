@@ -7,15 +7,18 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import TodoPage from "./pages/TodoPage"
 import TestPage from "./pages/TestPage"
+import NotFoundPage from "./pages/NotFoundPage"
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <TodoPage />
+    element: <TodoPage />,
+    errorElement: <NotFoundPage />
   },
   {
     path: "/testpage",
-    element: <TestPage />
+    element: <TestPage />,
+    errorElement: <NotFoundPage />
   }
 ]);
 

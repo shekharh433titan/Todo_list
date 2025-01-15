@@ -13,13 +13,15 @@ To get the app up and running on your local machine, follow these simple steps:
 Run the following command to install all necessary dependencies:
 
 ```bash
+cd my-app-v
 npm install
 ```
 
 ### 2. To run json db
 
 Run the following command to start json DataBase
-```
+```bash
+cd Todo_list/my-app-v/src/jsonDB
 json-server --watch db.json --port 3001
 ```
 
@@ -28,6 +30,7 @@ json-server --watch db.json --port 3001
 Run the following command to start the development server:
 
 ```bash
+cd my-app-v
 npm run dev
 ```
 
