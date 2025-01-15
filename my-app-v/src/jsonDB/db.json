@@ -1,14 +1,6 @@
 {
   "todos": [
     {
-      "id": "ffd2",
-      "key": "k2",
-      "displayName": "d234434",
-      "description": "d2",
-      "attribute": "a222",
-      "completed": false
-    },
-    {
       "id": "ce1f",
       "key": "k3",
       "displayName": "ds",

@@ -8,26 +8,19 @@ import { QueryClient } from "@tanstack/react-query";
 // Automatic Refetching: It refetches data in the background when necessary (e.g., on window focus or network reconnect).
 // State Sharing: The QueryClient allows you to share cached server state across different components of your app.
 
-var queryClient = null;
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: 1,
+            // refetchOnWindowFocus: false: This disables automatic refetching of queries 
+            // when the browser window regains focus. 
+            // (The default behavior in React Query is true.)
+            refetchOnWindowFocus: false,
+        },
+        mutations: {
+            retry: 1,
+        },
+    },
+});
 
-function MyQueryClient() {
-    if (queryClient === null) {
-        queryClient = new QueryClient({
-            defaultOptions: {
-                queries: {
-                    retry: 1,
-                    // refetchOnWindowFocus: false: This disables automatic refetching of queries 
-                    // when the browser window regains focus. 
-                    // (The default behavior in React Query is true.)
-                    refetchOnWindowFocus: false,
-                },
-                mutations: {
-                    retry: 1,
-                },
-            },
-        });
-    }
-    return queryClient;
-}
-
-export default MyQueryClient;
+export default queryClient;

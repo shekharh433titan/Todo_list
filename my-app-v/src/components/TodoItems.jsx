@@ -1,14 +1,10 @@
 import React from "react";
-import useTodoLogic from "../logic/useTodoLogic";
 
-function TodoItems() {
-
-  const {
-    todos,
-    deleteTodoFun,
-    handleEdit,
-    viewTodoComponent
-  } = useTodoLogic();
+function TodoItems({
+  todos,
+  deleteTodoFun,
+  handleEdit,
+  viewTodoComponent }) {
 
   return (
     <>

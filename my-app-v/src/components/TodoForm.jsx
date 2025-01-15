@@ -1,20 +1,15 @@
 import React from "react";
-import { QueryClientProvider } from "@tanstack/react-query";
-// import useTodoLogic from "./useTodoLogic";
 
-import { useTodoLogic } from "../logic/useTodoLogic";
-
-
-function TodoForm() {
-  const {
+function TodoForm(
+  {
     formData,
     handleChange,
     handleSubmitUpdateClick,
     handelCancelClick,
     isLoading,
     error,
-    buttonLabel
-  } = useTodoLogic();
+    buttonLabel }) {
+
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching data</div>;

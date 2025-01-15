@@ -1,11 +1,8 @@
 import React from "react";
-import useTodoLogic from "../logic/useTodoLogic";
 
-function TodoItemView() {
-    const {
-        viewTodoItem,
-        closeViewTodoComponent
-    } = useTodoLogic();
+function TodoItemView({ 
+    viewTodoItem,
+    closeViewTodoComponent }) {
 
     return (
         <div id="todo-item-view-id" className="todo-view-card container mt-3">
