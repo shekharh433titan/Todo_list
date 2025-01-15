@@ -15,7 +15,6 @@ function Todo() {
     isLoading,
     error,
     handleChange,
-    handleSubmit,
     deleteTodoFun,
     handleSubmitUpdateClick,
     handelCancelClick,

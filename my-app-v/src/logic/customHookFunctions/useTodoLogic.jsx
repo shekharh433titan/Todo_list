@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchTodos, addTodo, updateTodo, deleteTodo } from "../../api/api";
 import queryClient from "../MyQueryClient";
@@ -45,7 +45,7 @@ export default function useFormLogic() {
         },
     });
 
-    const deleteTodoFun = (todo) => {
+    const deleteTodoFun = useCallback((todo) => {
         deleteTodoMutation.mutate({
             id: todo.id,
             key: todo.key,
@@ -54,46 +54,36 @@ export default function useFormLogic() {
             attribute: todo.attribute,
             completed: false,
         });
-    };
+    }, [deleteTodoMutation]);
 
-    const handleChange = (e) => {
+    const handleChange = useCallback((e) => {
         const { id, value } = e.target;
-        setFormData((prev) => ({
+        setFormData(prev => ({
             ...prev,
             [id]: value,
         }));
-    };
+    }, []);
 
-    const validateTodoBeforeAdd = () => {
+    const validateTodoBeforeAdd = useCallback(() => {
         const { key, displayName, description, attribute } = formData;
 
-        // Check if any field is empty or contains only whitespace
-        if (
-            !key.trim() ||
-            !displayName.trim() ||
-            !description.trim() ||
-            !attribute.trim()
-        ) {
+        if (!key.trim() || !displayName.trim() || !description.trim() || !attribute.trim()) {
             return { isValid: false, message: "All fields must be filled with non-empty values." };
         }
 
-        // not check for key is unique or not
         if (editingTodo) {
             return { isValid: true, message: "Validation successful." };
         }
 
-        // Check if key is unique or not
-        const isKeyDuplicate = todos.some((todo) => todo.key === key);
+        const isKeyDuplicate = todos.some(todo => todo.key === key);
         if (isKeyDuplicate) {
             return { isValid: false, message: "Key already exists. Please use a unique key." };
         }
 
-        // If all validations pass
         return { isValid: true, message: "Validation successful." };
-    };
+    }, [formData, editingTodo, todos]);
 
-
-    const handleSubmit = (e) => {
+    const handleSubmit = useCallback((e) => {
         e.preventDefault();
         const validationRes = validateTodoBeforeAdd();
         if (validationRes.isValid) {
@@ -108,15 +98,15 @@ export default function useFormLogic() {
         } else {
             console.log("Failed to add todo items: ", validationRes.message);
         }
-    };
+    }, [addTodoMutation, formData, validateTodoBeforeAdd]);
 
-    const handleEdit = (todo) => {
+    const handleEdit = useCallback(todo => {
         setButtonLabel("Update");
         setEditingTodo(todo);
         setFormData(todo);
-    };
+    }, []);
 
-    const handleSubmitUpdateClick = (e) => {
+    const handleSubmitUpdateClick = useCallback((e) => {
         if (editingTodo) {
             const validationRes = validateTodoBeforeAdd();
             if (validationRes.isValid) {
@@ -133,27 +123,23 @@ export default function useFormLogic() {
         } else {
             handleSubmit(e);
         }
-    };
+    }, [editingTodo, formData, updateTodoMutation, validateTodoBeforeAdd, handleSubmit]);
 
-    const handelCancelClick = () => {
+    const handelCancelClick = useCallback(() => {
         setEditingTodo(null);
         setButtonLabel("Submit");
         setFormData(emptyTodo);
-    };
+    }, []);
 
-    const viewTodoComponent = (todo) => {
-        // console.log(todo);
+    const viewTodoComponent = useCallback(todo => {
         setViewTodoItem(todo);
-        const detailsDiv = document.getElementById("todo-item-view-id");
-        detailsDiv.style.display = "block"; // Show details
-    };
+        document.getElementById("todo-item-view-id").style.display = "block";
+    }, []);
 
-    const closeViewTodoComponent = () => {
-        // console.log(todo);
+    const closeViewTodoComponent = useCallback(() => {
         setViewTodoItem(emptyTodo);
-        const detailsDiv = document.getElementById("todo-item-view-id");
-        detailsDiv.style.display = "none"; // Show details
-    };
+        document.getElementById("todo-item-view-id").style.display = "none";
+    }, []);
 
     return {
         formData,
@@ -162,7 +148,6 @@ export default function useFormLogic() {
         isLoading,
         error,
         handleChange,
-        handleSubmit,
         deleteTodoFun,
         handleSubmitUpdateClick,
         handelCancelClick,
@@ -170,5 +155,5 @@ export default function useFormLogic() {
         viewTodoItem,
         viewTodoComponent,
         closeViewTodoComponent
-    }
+    };
 }
