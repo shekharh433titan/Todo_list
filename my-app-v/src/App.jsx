@@ -1,9 +1,9 @@
 import React, { useState, StrictMode } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 
-import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "./App.css";
 
 import TodoPage from "./pages/TodoPage"
 import TestPage from "./pages/TestPage"
