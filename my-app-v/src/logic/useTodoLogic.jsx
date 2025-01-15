@@ -8,7 +8,15 @@ import MyQueryClient from "./MyQueryClient";
 // consider using a React Context to share the logic and state globally 
 // while ensuring proper React Hook rules are followed.
 
+// createContext: Creates a Context object for global state management.
+// useContext: A hook to consume the context value.
+// useState: A hook for managing component-level state (not used in this code but often paired with context for state management).
+
 const TodoContext = createContext();
+
+// The TodoProvider is a React component that acts as the provider for the TodoContext.
+// Props:
+// 1. children: Represents the child components that will be wrapped by the TodoProvider.
 
 export const TodoProvider = ({ children }) => {
 
@@ -72,9 +80,39 @@ export const TodoProvider = ({ children }) => {
         }));
     };
 
+    const validateTodoBeforeAdd = () => {
+        const { key, displayName, description, attribute } = formData;
+
+        // Check if any field is empty or contains only whitespace
+        if (
+            !key.trim() ||
+            !displayName.trim() ||
+            !description.trim() ||
+            !attribute.trim()
+        ) {
+            return { isValid: false, message: "All fields must be filled with non-empty values." };
+        }
+
+        // not check for key is unique or not
+        if (editingTodo) {
+            return { isValid: true, message: "Validation successful." };
+        }
+
+        // Check if key is unique or not
+        const isKeyDuplicate = todos.some((todo) => todo.key === key);
+        if (isKeyDuplicate) {
+            return { isValid: false, message: "Key already exists. Please use a unique key." };
+        }
+
+        // If all validations pass
+        return { isValid: true, message: "Validation successful." };
+    };
+
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (formData.displayName.trim() && formData.key.trim()) {
+        const validationRes = validateTodoBeforeAdd();
+        if (validationRes.isValid) {
             addTodoMutation.mutate({
                 key: formData.key,
                 displayName: formData.displayName,
@@ -83,6 +121,8 @@ export const TodoProvider = ({ children }) => {
                 completed: false,
             });
             setFormData(emptyTodo);
+        } else {
+            console.log("Failed to add todo items: ", validationRes.message);
         }
     };
 
@@ -94,10 +134,15 @@ export const TodoProvider = ({ children }) => {
 
     const handleSubmitUpdateClick = (e) => {
         if (editingTodo) {
-            updateTodoMutation.mutate({
-                ...editingTodo,
-                ...formData,
-            });
+            const validationRes = validateTodoBeforeAdd();
+            if (validationRes.isValid) {
+                updateTodoMutation.mutate({
+                    ...editingTodo,
+                    ...formData,
+                });
+            }else{
+                console.log("Failed to update todo items: ", validationRes.message);
+            }
             setEditingTodo(null);
             setButtonLabel("Submit");
             setFormData(emptyTodo);
@@ -112,14 +157,14 @@ export const TodoProvider = ({ children }) => {
         setFormData(emptyTodo);
     };
 
-    const viewTodo = (todo) => {
-        console.log(todo);
+    const viewTodoComponent = (todo) => {
+        // console.log(todo);
         setViewTodoItem(todo);
         const detailsDiv = document.getElementById("todo-item-view-id");
         detailsDiv.style.display = "block"; // Show details
     };
 
-    const closeViewTodoComp = () => {
+    const closeViewTodoComponent = () => {
         // console.log(todo);
         setViewTodoItem(emptyTodo);
         const detailsDiv = document.getElementById("todo-item-view-id");
@@ -127,15 +172,17 @@ export const TodoProvider = ({ children }) => {
     };
 
 
+    // The TodoContext.Provider wraps the children components, 
+    // making the provided value accessible to any component within this context tree.
+
+    // The {value} prop is an object that contains the data or functions 
+    // that should be shared with the context consumers (like wrap component)
 
     return (
         <TodoContext.Provider
             value={{
                 formData,
-                setFormData,
                 buttonLabel,
-                editingTodo,
-                setEditingTodo,
                 todos,
                 isLoading,
                 error,
@@ -145,9 +192,9 @@ export const TodoProvider = ({ children }) => {
                 handleSubmitUpdateClick,
                 handelCancelClick,
                 handleEdit,
-                viewTodo,
                 viewTodoItem,
-                closeViewTodoComp
+                viewTodoComponent,
+                closeViewTodoComponent
             }}
         >
             {children}
@@ -156,6 +203,9 @@ export const TodoProvider = ({ children }) => {
 };
 
 export const useTodoLogic = () => {
+    // useTodoLogic is a custom hook that simplifies consuming the TodoContext.
+    // It uses useContext(TodoContext) to get the context value.
+    // This custom hook makes the context usage cleaner and abstracts away the direct use of useContext.
     return useContext(TodoContext);
 };
 

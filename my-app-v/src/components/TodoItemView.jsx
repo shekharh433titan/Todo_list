@@ -4,7 +4,7 @@ import useTodoLogic from "../logic/useTodoLogic";
 function TodoItemView() {
     const {
         viewTodoItem,
-        closeViewTodoComp
+        closeViewTodoComponent
     } = useTodoLogic();
 
     return (
@@ -15,7 +15,7 @@ function TodoItemView() {
                     <h6 className="card-title"> <strong> Key: </strong> {viewTodoItem.key}</h6>
                     <p className="card-text"><strong>Description:</strong> {viewTodoItem.description}</p>
                     <p className="card-text"><strong>Attribute:</strong> {viewTodoItem.attribute}</p>
-                    <a onClick={() => closeViewTodoComp()} className="btn btn-outline-danger">X</a>
+                    <a onClick={() => closeViewTodoComponent()} className="btn btn-outline-danger">X</a>
                 </div>
             </div>
         </div>

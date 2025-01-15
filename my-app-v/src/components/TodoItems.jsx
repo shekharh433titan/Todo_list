@@ -7,7 +7,7 @@ function TodoItems() {
     todos,
     deleteTodoFun,
     handleEdit,
-    viewTodo
+    viewTodoComponent
   } = useTodoLogic();
 
   return (
@@ -41,7 +41,7 @@ function TodoItems() {
                       <li>
                         <button
                           className="dropdown-item"
-                          onClick={() => viewTodo(todo)}
+                          onClick={() => viewTodoComponent(todo)}
                         >
                           View
                         </button>
