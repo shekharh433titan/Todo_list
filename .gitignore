@@ -3,6 +3,9 @@ test.jsx
 zz_prob.txt
 zz.html
 
+#data file
+./src/jsonDB/db.json
+
 # Logs
 logs
 *.log
