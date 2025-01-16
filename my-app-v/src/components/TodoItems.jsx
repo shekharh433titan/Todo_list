@@ -15,6 +15,7 @@ function TodoItems({
               <th scope="col">ID</th>
               <th scope="col">KEY</th>
               <th scope="col">NAME</th>
+              <th scope="col"></th>
             </tr>
           </thead>
           <tbody>
