@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { fetchTodos, addTodo, updateTodo, deleteTodo } from "../../api/api";
-import queryClient from "../MyQueryClient";
+import { fetchTodos, addTodo, updateTodo, deleteTodo } from "../api/api";
+import queryClient from "../utils/queryClient";
 
 
 export default function useFormLogic() {
@@ -46,14 +46,29 @@ export default function useFormLogic() {
     });
 
     const deleteTodoFun = useCallback((todo) => {
-        deleteTodoMutation.mutate({
-            id: todo.id,
-            key: todo.key,
-            displayName: todo.displayName,
-            description: todo.description,
-            attribute: todo.attribute,
-            completed: false,
-        });
+        // not block delete if that todo item is not being editing.
+        if (editingTodo && editingTodo.id === todo.id) {
+            // make a alert to user that you are editing this todo item
+            alert("You are editing this todo item. Please cancel editing to delete this item.");
+            return;
+        }
+
+        // asked user to confirm before deleting
+        if (window.confirm("Are you sure you want to delete this todo item?")) {
+            
+            if(viewTodoItem.id === todo.id){
+                closeViewTodoComponent();
+            }
+
+            deleteTodoMutation.mutate({
+                id: todo.id,
+                key: todo.key,
+                displayName: todo.displayName,
+                description: todo.description,
+                attribute: todo.attribute,
+                completed: false,
+            });
+        }
     }, [deleteTodoMutation]);
 
     const handleChange = useCallback((e) => {
