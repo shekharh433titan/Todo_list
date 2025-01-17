@@ -4,8 +4,8 @@ function TodoForm(
   {
     formData,
     handleChange,
-    handleSubmitUpdateClick,
-    handelCancelClick,
+    handleSubmit,
+    cancelEdit,
     isLoading,
     error,
     buttonLabel }) {
@@ -80,15 +80,16 @@ function TodoForm(
           <div className="btn-group">
             <button
               id="submit-update-btn"
-              onClick={handleSubmitUpdateClick}
+              onClick={handleSubmit}
               type="button"
               className="btn btn-primary me-2"
             >
               {buttonLabel}
             </button>
+
             <button
               id="cancel-btn"
-              onClick={handelCancelClick}
+              onClick={cancelEdit}
               type="button"
               className="btn btn-secondry me-2"
             >
