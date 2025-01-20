@@ -18,7 +18,9 @@ function TodoPage() {
     isLoading,
     error,
     onSubmit,
-    deleteTodoMutation
+    deleteTodoMutation,
+    viewTodoItemContainer,
+    setViewTodoItemContainer
   } = useTodoLogic();
 
   const {
@@ -30,14 +32,14 @@ function TodoPage() {
     handleSubmit,
     handleEdit,
     cancelEdit,
-  } = useTodoForm({onSubmit, todos});
+  } = useTodoForm({ onSubmit, todos, setViewTodoItemContainer });
 
   const {
     viewTodoItem,
     closeViewTodoComponent,
     deleteTodoAction,
     viewTodoComponent
-  } = useTodoItems({ handleEdit, editingTodo, deleteTodoMutation, emptyTodo });
+  } = useTodoItems({ handleEdit, editingTodo, deleteTodoMutation, emptyTodo, setViewTodoItemContainer });
 
   return (
     <>
@@ -51,11 +53,13 @@ function TodoPage() {
         cancelEdit={cancelEdit}
         isLoading={isLoading}
         error={error}
-        buttonLabel={buttonLabel} />
+        buttonLabel={buttonLabel}
+        setViewTodoItemContainer={setViewTodoItemContainer} />
 
       <TodoItemView
         viewTodoItem={viewTodoItem}
         closeViewTodoComponent={closeViewTodoComponent}
+        viewTodoItemContainer={viewTodoItemContainer}
       />
 
       {/* To show all todos */}

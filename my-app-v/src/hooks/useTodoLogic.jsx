@@ -7,18 +7,7 @@ import Swal from 'sweetalert2'
 
 export default function useFormLogic() {
 
-    const fireAlertBySwel = (
-        icon = "warning",
-        title = "Alert",
-        text = "Something happened!"
-    ) => {
-        Swal.fire({
-            icon: icon,
-            title: title,
-            text: text,
-            confirmButtonText: "OK"
-        });
-    };
+    const [viewTodoItemContainer, setViewTodoItemContainer] = useState(false);
 
     // Fetch Todos
     const { data: todos = [], isLoading, error } = useQuery({
@@ -61,6 +50,8 @@ export default function useFormLogic() {
         isLoading,
         error,
         onSubmit,
-        deleteTodoMutation
+        deleteTodoMutation,
+        viewTodoItemContainer,
+        setViewTodoItemContainer
     };
 }

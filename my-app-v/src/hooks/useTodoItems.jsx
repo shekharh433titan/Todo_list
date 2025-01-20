@@ -1,9 +1,8 @@
 import React, { useCallback, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import Swal from 'sweetalert2'
 
 
-export default function useFormLogic({editingTodo, deleteTodoMutation,emptyTodo}) {
+export default function useTodoItems({ editingTodo, deleteTodoMutation, emptyTodo, setViewTodoItemContainer }) {
 
     const [viewTodoItem, setViewTodoItem] = useState(emptyTodo);
 
@@ -23,7 +22,11 @@ export default function useFormLogic({editingTodo, deleteTodoMutation,emptyTodo}
     const deleteTodoAction = useCallback((todo) => {
         // not block delete if that todo item is not being editing.
         if (editingTodo && editingTodo.id === todo.id) {
-            fireAlertBySwel("warning", "Editing in Progress!", "You are editing this todo item. Please cancel editing to delete this item.");
+            fireAlertBySwel(
+                "warning",
+                "Editing in Progress!",
+                "You are editing this todo item. Please cancel editing to delete this item."
+            );
             return;
         }
 
@@ -38,15 +41,24 @@ export default function useFormLogic({editingTodo, deleteTodoMutation,emptyTodo}
                 if (viewTodoItem.id === todo.id) {
                     closeViewTodoComponent();
                 }
-                deleteTodoMutation.mutate({
-                    id: todo.id,
-                    key: todo.key,
-                    displayName: todo.displayName,
-                    description: todo.description,
-                    attribute: todo.attribute,
-                    completed: false,
-                });
-                Swal.fire("Delete!", "", "success");
+                deleteTodoMutation.mutate(
+                    {
+                        id: todo.id,
+                        key: todo.key,
+                        displayName: todo.displayName,
+                        description: todo.description,
+                        attribute: todo.attribute,
+                        completed: false,
+                    },
+                    {
+                        onSuccess: () => {
+                            fireAlertBySwel("success", "Deleted!", "The todo has been deleted.");
+                        },
+                        onError: (error) => {
+                            fireAlertBySwel("error", "Error!", "Failed to delete the todo.");
+                        }
+                    }
+                );
             }
         });
     }, [deleteTodoMutation]);
@@ -54,12 +66,12 @@ export default function useFormLogic({editingTodo, deleteTodoMutation,emptyTodo}
 
     const viewTodoComponent = useCallback(todo => {
         setViewTodoItem(todo);
-        document.getElementById("todo-item-view-id").style.display = "block";
+        setViewTodoItemContainer(true);
     }, []);
 
     const closeViewTodoComponent = useCallback(() => {
         setViewTodoItem(emptyTodo);
-        document.getElementById("todo-item-view-id").style.display = "none";
+        setViewTodoItemContainer(false);
     }, []);
 
     return {

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import Swal from "sweetalert2";
 
-export default function useTodoForm({onSubmit, todos}) {
+export default function useTodoForm({onSubmit, todos, setViewTodoItemContainer}) {
 
     const emptyTodo = {
         displayName: "",
@@ -57,6 +57,7 @@ export default function useTodoForm({onSubmit, todos}) {
 
     // Edit a todo
     const handleEdit = useCallback((todo) => {
+        setViewTodoItemContainer(false);
         setEditingTodo(todo);
         setFormData(todo);
         setButtonLabel("Update");

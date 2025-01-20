@@ -2,6 +2,8 @@ import axios from "axios";
 const API_URL = "http://localhost:3001/todos";
 
 // Create an Axios instance
+// "Content-Type": "application/json": This header specifies that the content being sent in 
+// the request body is in JSON (JavaScript Object Notation) format.
 const apiClient = axios.create({
     baseURL: API_URL,
     headers: {
@@ -16,7 +18,7 @@ apiClient.interceptors.request.use(
         return config;
     },
     (error) => {
-        // console.error("Request error:", error);
+        // setError(error.message); //***
         return Promise.reject(error);
     }
 );
@@ -29,6 +31,7 @@ apiClient.interceptors.response.use(
     },
     (error) => {
         handleGlobalError(error);
+        // setError(error.message); //***
         return Promise.reject(error);
     }
 );
@@ -60,6 +63,6 @@ export const updateTodo = async (updatedTodo) => {
     return response.data;
 };
 
-export const deleteTodo = async (id) => {
-    await apiClient.delete(`/${id}`);
+export const deleteTodo = async (todo) => {
+    await apiClient.delete(`/${todo.id}`);
 };
