@@ -5,6 +5,7 @@ zz.html
 
 #data file
 my-app-v/jsonDB/db.json
+jsonDB/db.json
 
 # Logs
 logs
