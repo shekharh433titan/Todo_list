@@ -43,9 +43,9 @@ body {
   border: 2px solid red;
 }
 
-.todo-view-card {
+/* .todo-view-card {
   display: none;
-}
+} */
 
 .todo-lists-table {
   border: 5px solid gray;

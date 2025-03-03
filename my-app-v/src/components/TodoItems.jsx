@@ -2,7 +2,7 @@ import React from "react";
 
 function TodoItems({
   todos,
-  deleteTodoFun,
+  deleteTodoAction,
   handleEdit,
   viewTodoComponent }) {
 
@@ -46,7 +46,7 @@ function TodoItems({
                       <li>
                         <button
                           className="dropdown-item text-danger"
-                          onClick={() => deleteTodoFun(todo)}
+                          onClick={() => deleteTodoAction(todo)}
                         >
                           Delete
                         </button>

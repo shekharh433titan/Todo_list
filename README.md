@@ -14,7 +14,7 @@ Run the following command to install all necessary dependencies:
 
 ```bash
 cd my-app-v
-npm install
+yarn install
 ```
 
 ### 2. To run json db
@@ -31,7 +31,7 @@ Run the following command to start the development server:
 
 ```bash
 cd my-app-v
-npm run dev
+yarn run dev
 ```
 
 ### 📋 Features

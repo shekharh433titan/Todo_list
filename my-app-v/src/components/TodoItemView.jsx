@@ -2,7 +2,12 @@ import React from "react";
 
 function TodoItemView({ 
     viewTodoItem,
-    closeViewTodoComponent }) {
+    closeViewTodoComponent,
+    viewTodoItemContainer}) {
+
+    if (viewTodoItemContainer === false) {
+        return null;
+    }
 
     return (
         <div id="todo-item-view-id" className="todo-view-card container mt-3">

@@ -4,7 +4,8 @@ zz_prob.txt
 zz.html
 
 #data file
-my-app-v/src/jsonDB/db.json
+my-app-v/jsonDB/db.json
+jsonDB/db.json
 
 # Logs
 logs
