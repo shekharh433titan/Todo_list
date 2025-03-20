@@ -1,0 +1,69 @@
+name: Notify on PR & Comments
+
+on:
+  pull_request:
+    types: [opened, closed]
+
+  issue_comment:
+    types: [created]
+
+jobs:
+  notify-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Flock about PR
+        env:
+          ACTION: ${{ github.event.action }}
+          TITLE: ${{ github.event.pull_request.title }}
+          DESCRIPTION: ${{ github.event.pull_request.body }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          FROM_BRANCH: ${{ github.event.pull_request.head.ref }}
+          TO_BRANCH: ${{ github.event.pull_request.base.ref }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          JSON_PAYLOAD=$(jq -n \
+            --arg action "$ACTION" \
+            --arg title "$TITLE" \
+            --arg description "$DESCRIPTION" \
+            --arg author "$AUTHOR" \
+            --arg from "$FROM_BRANCH" \
+            --arg to "$TO_BRANCH" \
+            --arg url "$PR_URL" \
+            '{
+              text: "🔔 *Pull Request \($action)*\n\n*Title:* \($title)\n\n*Description:*\n\($description)\n\n*Author:* \($author)\n\n*From:* `\($from)` ➡️ *To:* `\($to)`\n\n🔗 *PR Link:* \($url)"
+            }'
+          )
+
+          echo "Sending PR notification payload:"
+          echo "$JSON_PAYLOAD"
+
+          curl -X POST -H "Content-Type: application/json" \
+            -d "$JSON_PAYLOAD" \
+            https://api.flock.com/hooks/sendMessage/61adf044-a5e9-4c93-97bb-3112736b4bcf
+
+  notify-comment:
+    if: github.event_name == 'issue_comment' && github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Flock about PR Comment
+        env:
+          COMMENTER: ${{ github.event.comment.user.login }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: |
+          JSON_PAYLOAD=$(jq -n \
+            --arg commenter "$COMMENTER" \
+            --arg comment "$COMMENT_BODY" \
+            --arg url "$ISSUE_URL" \
+            '{
+              text: "💬 *New comment on PR*\n\n*Commenter:* \($commenter)\n\n*Comment:*\n\($comment)\n\n🔗 *PR Link:* \($url)"
+            }'
+          )
+
+          echo "Sending PR comment notification payload:"
+          echo "$JSON_PAYLOAD"
+
+          curl -X POST -H "Content-Type: application/json" \
+            -d "$JSON_PAYLOAD" \
+            https://api.flock.com/hooks/sendMessage/61adf044-a5e9-4c93-97bb-3112736b4bcf
