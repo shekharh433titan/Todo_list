@@ -1,0 +1,45 @@
+name: Notify on PR & Comments
+
+on:
+  pull_request:
+    types: [opened, closed]
+
+  issue_comment:
+    types: [created]
+
+jobs:
+  notify-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Export PR description to env
+        run: echo "PR_DESCRIPTION<<EOF" >> $GITHUB_ENV && echo "${{ github.event.pull_request.body }}" >> $GITHUB_ENV && echo "EOF" >> $GITHUB_ENV
+
+      - name: Notify Flock about PR
+        run: |
+          # Escape multiline PR description for JSON payload
+          ESCAPED_DESC=$(echo "$PR_DESCRIPTION" | jq -Rsa .)
+
+          curl -X POST -H "Content-Type: application/json" \
+            -d "{
+              \"text\": \"🔔 *Pull Request ${{ github.event.action }}*\n\n*Title:* ${{ github.event.pull_request.title }}*\n\n*Description:* $ESCAPED_DESC\n\n*Author:* ${{ github.event.pull_request.user.login }}\n\n*From:* \`${{ github.event.pull_request.head.ref }}\` ➡️ *To:* \`${{ github.event.pull_request.base.ref }}\`\n\n🔗 *PR Link:* ${{ github.event.pull_request.html_url }}\"
+            }" \
+            https://api.flock.com/hooks/sendMessage/61adf044-a5e9-4c93-97bb-3112736b4bcf
+
+  notify-comment:
+    if: github.event_name == 'issue_comment' && github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Export comment body to env
+        run: echo "COMMENT_BODY<<EOF" >> $GITHUB_ENV && echo "${{ github.event.comment.body }}" >> $GITHUB_ENV && echo "EOF" >> $GITHUB_ENV
+
+      - name: Notify Flock about PR Comment
+        run: |
+          # Escape multiline comment body for JSON payload
+          ESCAPED_COMMENT=$(echo "$COMMENT_BODY" | jq -Rsa .)
+
+          curl -X POST -H "Content-Type: application/json" \
+            -d "{
+              \"text\": \"💬 *New comment on PR*\n\n*Commenter:* ${{ github.event.comment.user.login }}*\n\n*Comment:*\n$ESCAPED_COMMENT\n\n🔗 *PR Link:* ${{ github.event.issue.html_url }}\"
+            }" \
+            https://api.flock.com/hooks/sendMessage/61adf044-a5e9-4c93-97bb-3112736b4bcf
