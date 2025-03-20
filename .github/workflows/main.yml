@@ -1,0 +1,104 @@
+name: Notify on PR & Comments
+
+on:
+  pull_request:
+    types: [opened, closed]
+
+  issue_comment:
+    types: [created]
+
+jobs:
+  notify-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Flock about PR (Links & Images Only)
+        env:
+          ACTION: ${{ github.event.action }}
+          TITLE: ${{ github.event.pull_request.title }}
+          DESCRIPTION: ${{ github.event.pull_request.body }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          FROM_BRANCH: ${{ github.event.pull_request.head.ref }}
+          TO_BRANCH: ${{ github.event.pull_request.base.ref }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          echo "Original description:"
+          echo "$DESCRIPTION"
+
+          # Extract Markdown links
+          MARKDOWN_LINKS=$(echo "$DESCRIPTION" | grep -Eo '\[.*?\]\(.*?\)')
+
+          # Extract image URLs (either from <img> tags or Markdown images ![alt](url))
+          IMAGE_MARKDOWN=$(echo "$DESCRIPTION" | grep -Eo '!\[.*?\]\(.*?\)')
+          IMAGE_TAGS=$(echo "$DESCRIPTION" | grep -Eo '<img [^>]*src="[^"]*"' | sed -E 's/.*src="([^"]*)".*/\1/')
+
+          # Combine links and images
+          CLEAN_DESC="$MARKDOWN_LINKS"$'\n'"$IMAGE_MARKDOWN"$'\n'"$IMAGE_TAGS"
+
+          echo "Filtered description (Links & Images):"
+          echo "$CLEAN_DESC"
+
+          # Escape for JSON
+          ESCAPED_DESC=$(echo "$CLEAN_DESC" | jq -Rsa .)
+
+          JSON_PAYLOAD=$(jq -n \
+            --arg action "$ACTION" \
+            --arg title "$TITLE" \
+            --arg description "$CLEAN_DESC" \
+            --arg author "$AUTHOR" \
+            --arg from "$FROM_BRANCH" \
+            --arg to "$TO_BRANCH" \
+            --arg url "$PR_URL" \
+            '{
+              text: "🔔 *Pull Request \($action)*\n\n*Title:* \($title)\n\n*Description:*\n\($description)\n\n*Author:* \($author)\n\n*From:* `\($from)` ➡️ *To:* `\($to)`\n\n🔗 *PR Link:* \($url)"
+            }'
+          )
+
+          echo "Sending PR notification payload:"
+          echo "$JSON_PAYLOAD"
+
+          curl -X POST -H "Content-Type: application/json" \
+            -d "$JSON_PAYLOAD" \
+            https://api.flock.com/hooks/sendMessage/61adf044-a5e9-4c93-97bb-3112736b4bcf
+
+  notify-comment:
+    if: github.event_name == 'issue_comment' && github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Flock about PR Comment
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENTER: ${{ github.event.comment.user.login }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: |
+          echo "Original comment:"
+          echo "$COMMENT_BODY"
+
+          # Extract Markdown links and image links
+          MARKDOWN_LINKS=$(echo "$COMMENT_BODY" | grep -Eo '\[.*?\]\(.*?\)')
+          IMAGE_MARKDOWN=$(echo "$COMMENT_BODY" | grep -Eo '!\[.*?\]\(.*?\)')
+          IMAGE_TAGS=$(echo "$COMMENT_BODY" | grep -Eo '<img [^>]*src="[^"]*"' | sed -E 's/.*src="([^"]*)".*/\1/')
+
+          CLEAN_COMMENT="$MARKDOWN_LINKS"$'\n'"$IMAGE_MARKDOWN"$'\n'"$IMAGE_TAGS"
+
+          echo "Filtered comment (Links & Images):"
+          echo "$CLEAN_COMMENT"
+
+          # Escape for JSON
+          ESCAPED_COMMENT=$(echo "$CLEAN_COMMENT" | jq -Rsa .)
+
+          JSON_PAYLOAD=$(jq -n \
+            --arg commenter "$COMMENTER" \
+            --arg comment "$CLEAN_COMMENT" \
+            --arg issue "$ISSUE_URL" \
+            '{
+              text: "💬 *New comment on PR*\n\n*Commenter:* \($commenter)\n\n*Comment:*\n\($comment)\n\n🔗 *PR Link:* \($issue)"
+            }'
+          )
+
+          echo "Sending comment notification payload:"
+          echo "$JSON_PAYLOAD"
+
+          curl -X POST -H "Content-Type: application/json" \
+            -d "$JSON_PAYLOAD" \
+            https://api.flock.com/hooks/sendMessage/61adf044-a5e9-4c93-97bb-3112736b4bcf
