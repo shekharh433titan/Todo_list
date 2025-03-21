@@ -50,7 +50,7 @@ jobs:
           JSON_PAYLOAD=$(jq -n \
             --arg action "$ACTION" \
             --arg title "$TITLE" \
-            --arg description "$CLEAN_DESC" \
+            --argjson description "$ESCAPED_DESC" \
             --arg author "$AUTHOR" \
             --arg from "$FROM_BRANCH" \
             --arg to "$TO_BRANCH" \
@@ -104,7 +104,7 @@ jobs:
 
           JSON_PAYLOAD=$(jq -n \
             --arg commenter "$COMMENTER" \
-            --arg comment "$CLEAN_COMMENT" \
+            --argjson comment "$ESCAPED_COMMENT" \
             --arg issue "$ISSUE_URL" \
             '{
               text: "💬 *New comment on PR*\n\n*Commenter:* \($commenter)\n\n*Comment:*\n\($comment)\n\n🔗 *PR Link:* \($issue)"
