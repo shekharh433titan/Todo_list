@@ -65,7 +65,7 @@ jobs:
 
           curl -X POST -H "Content-Type: application/json" \
             -d "$JSON_PAYLOAD" \
-            https://api.flock.com/hooks/sendMessage/61adf044-a5e9-4c93-97bb-3112736b4bcf
+            https://api.flock.com/hooks/sendMessage/a90391cd-16c3-486d-8ef5-cf6152075019
 
   notify-comment:
     if: github.event_name == 'issue_comment' && github.event.issue.pull_request
@@ -116,4 +116,4 @@ jobs:
 
           curl -X POST -H "Content-Type: application/json" \
             -d "$JSON_PAYLOAD" \
-            https://api.flock.com/hooks/sendMessage/61adf044-a5e9-4c93-97bb-3112736b4bcf
+            https://api.flock.com/hooks/sendMessage/a90391cd-16c3-486d-8ef5-cf6152075019
