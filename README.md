@@ -39,3 +39,4 @@ yarn run dev
 * ✅ Mark as Complete: Mark tasks as completed to keep track of your progress.
 * ❌ Delete Tasks: Remove tasks when they're no longer needed.
 * 💾 Persistent Data Storage: Your data is stored using a JSON database for seamless task management.
+* 
