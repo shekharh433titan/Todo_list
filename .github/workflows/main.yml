@@ -77,6 +77,9 @@ jobs:
           COMMENTER: ${{ github.event.comment.user.login }}
           ISSUE_URL: ${{ github.event.issue.html_url }}
         run: |
+          echo "Dump event JSON for debugging:"
+          echo '${{ toJSON(github.event) }}'
+          
           set -e  # exit on first failure
 
           echo "Original comment:"
